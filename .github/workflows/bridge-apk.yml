@@ -1,0 +1,38 @@
+name: Bridge current APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/bridge-apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download published APK
+        run: |
+          curl -L --fail --retry 3             -o Relationship-Spice-1.0.2-release.apk             "https://github.com/tybiboune/Spiceapp-releases/releases/download/android-v1.0.2/Relationship-Spice-1.0.2-release.apk"
+          sha256sum Relationship-Spice-1.0.2-release.apk
+          ls -lh Relationship-Spice-1.0.2-release.apk
+
+      - name: Inspect package and signature
+        run: |
+          AAPT=$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)
+          echo "AAPT=$AAPT"
+          echo "APKSIGNER=$APKSIGNER"
+          "$AAPT" dump badging Relationship-Spice-1.0.2-release.apk | head -20
+          "$APKSIGNER" verify --print-certs --verbose Relationship-Spice-1.0.2-release.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spice-apk-1.0.2
+          path: Relationship-Spice-1.0.2-release.apk
+          retention-days: 1
+          compression-level: 0
