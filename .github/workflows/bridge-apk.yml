@@ -18,7 +18,9 @@ jobs:
     steps:
       - name: Download published APK
         run: |
-          curl -L --fail --retry 3             -o Relationship-Spice-1.0.2-release.apk             "https://github.com/tybiboune/Spiceapp-releases/releases/download/android-v1.0.2/Relationship-Spice-1.0.2-release.apk"
+          curl -L --fail --retry 3 \
+            -o Relationship-Spice-1.0.2-release.apk \
+            "https://github.com/tybiboune/Spiceapp-releases/releases/download/android-v1.0.2/Relationship-Spice-1.0.2-release.apk"
           sha256sum Relationship-Spice-1.0.2-release.apk
           ls -lh Relationship-Spice-1.0.2-release.apk
 
@@ -44,21 +46,8 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq apktool
           mkdir -p bridge-tools/android-build-tools/lib
-          APKTOOL_JAR=$(dpkg -L apktool | grep -E '/apktool[^/]*\.jar
-          BT=$(dirname "$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)")
-          cp "$BT/apksigner" bridge-tools/android-build-tools/apksigner
-          cp "$BT/zipalign" bridge-tools/android-build-tools/zipalign
-          cp "$BT/lib/apksigner.jar" bridge-tools/android-build-tools/lib/apksigner.jar
-          chmod +x bridge-tools/android-build-tools/apksigner bridge-tools/android-build-tools/zipalign
-          ls -lh bridge-tools bridge-tools/android-build-tools bridge-tools/android-build-tools/lib
-
-      - name: Upload Android toolchain artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: spice-android-tools
-          path: bridge-tools
-          retention-days: 1
- | head -1)
+          APKTOOL_JAR=$(dpkg -L apktool | grep -E '/apktool[^/]*\.jar$' | head -1)
+          echo "APKTOOL_JAR=$APKTOOL_JAR"
           test -n "$APKTOOL_JAR"
           cp "$APKTOOL_JAR" bridge-tools/apktool.jar
           BT=$(dirname "$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)")
